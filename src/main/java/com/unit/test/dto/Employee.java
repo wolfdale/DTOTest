@@ -33,4 +33,20 @@ public class Employee {
         this.age = age;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+
+        if (obj instanceof Employee) {
+            Employee e = (Employee) obj;
+
+            if(e.getFirstName() != null) {
+                return this.firstName.equalsIgnoreCase(e.getFirstName()) ? true : false;
+            }
+            else {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
