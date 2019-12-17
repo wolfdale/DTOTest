@@ -5,10 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.springframework.scheduling.support.SimpleTriggerContext;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
@@ -71,7 +69,7 @@ public abstract class AbstractDTOTest<T extends AbstractBaseDTO<T>> {
      * This will act as a source method to provide all fields in
      * DTO.
      */
-    public Stream<Object> getFieldNames(){
+    public Stream<Object> getFieldNames() {
         return Stream.of(this.fields.keySet().toArray());
     }
 
@@ -93,7 +91,7 @@ public abstract class AbstractDTOTest<T extends AbstractBaseDTO<T>> {
     @ParameterizedTest
     @MethodSource("getFieldNames")
     public void testForEquality(String field) throws Exception {
-        Method [] method = this.fields.get(field);
+        Method[] method = this.fields.get(field);
 
         T ob1 = this.getInstance();
         T ob2 = this.getInstance();
@@ -132,7 +130,7 @@ public abstract class AbstractDTOTest<T extends AbstractBaseDTO<T>> {
 
     @ParameterizedTest
     @MethodSource("getFieldNames")
-    public void testPopulateForIndividualFields(String field) throws Exception{
+    public void testPopulateForIndividualFields(String field) throws Exception {
         T objA = this.getInstance();
         T objB = this.getInstance();
 
@@ -145,7 +143,60 @@ public abstract class AbstractDTOTest<T extends AbstractBaseDTO<T>> {
         objB.populate(objA);
 
         assertEquals(objA, objB);
+    }
+
+    @Test
+    public void testPopulateForIndividualField() throws Exception {
+        T objA = this.getInstance();
+        T objB = this.getInstance();
+
+        assertTrue(objA.equals(objB));
+
+        for (Map.Entry<String, Method[]> entry : this.fields.entrySet()) {
+            String field = entry.getKey();
+            Object input = this.getInputValueForMutator(field);
+            Method[] methods = entry.getValue();
+            methods[1].invoke(objA, input);
+        }
+
+        objB.populate(objA);
+
+        assertEquals(objA, objB);
 
     }
 
+    @ParameterizedTest
+    @MethodSource("getFieldNames")
+    public void testHashCodeForIndividualFields(String field) throws Exception {
+        T objA = this.getInstance();
+        T objB = this.getInstance();
+
+        assertTrue(objA.equals(objB));
+
+        Object input = this.getInputValueForMutator(field);
+
+        Method[] methods = this.fields.get(field);
+        methods[1].invoke(objA, input);
+
+        assertFalse(objA.hashCode() == objB.hashCode());
+    }
+
+    @Test
+    public void testHashCodeForAllField() throws Exception {
+        T objA = this.getInstance();
+        T objB = this.getInstance();
+
+        for (Map.Entry<String, Method[]> entry : this.fields.entrySet()) {
+            Method[] methods = entry.getValue();
+            String field = entry.getKey();
+            Object input = this.getInputValueForMutator(field);
+            methods[1].invoke(objA, input);
+            methods[1].invoke(objB, input);
+
+            //assertTrue(objA.hashCode() == objB.hashCode());
+
+        }
+
+        assertEquals(objA.hashCode(), objB.hashCode());
+    }
 }

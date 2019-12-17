@@ -1,5 +1,7 @@
 package com.unit.test.dto;
 
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 /**
  * Employee DTO
  */
@@ -67,5 +69,14 @@ public class Employee extends AbstractBaseDTO<Employee>{
         this.setAge(e.getAge());
 
         return this;
+    }
+
+    @Override
+    public int hashCode() {
+        HashCodeBuilder build = new HashCodeBuilder(45, 3)
+                .append(this.getFirstName() != null ? this.getFirstName() : null)
+                .append(this.getLastName() != null ? this.getLastName() : null)
+                .append(this.getAge());
+        return build.hashCode();
     }
 }
