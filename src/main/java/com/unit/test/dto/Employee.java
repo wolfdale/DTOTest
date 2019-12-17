@@ -1,9 +1,11 @@
 package com.unit.test.dto;
 
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 /**
  * Employee DTO
  */
-public class Employee {
+public class Employee extends AbstractBaseDTO<Employee>{
 
     private String firstName;
     private String lastName;
@@ -33,4 +35,48 @@ public class Employee {
         this.age = age;
     }
 
+    /**
+     * This is not good implementation of equals method.
+     * Quick hack is done just to demo how DTO testing
+     * is performed.
+     *
+     * @param obj
+     * @return
+     */
+    @Override
+    public boolean equals(Object obj) {
+
+        if (obj instanceof Employee) {
+            Employee e = (Employee) obj;
+
+            if (e.getFirstName() != null) {
+                return this.firstName.equalsIgnoreCase(e.getFirstName()) ? true : false;
+            } else {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Populate Method
+     */
+    @Override
+    public Employee populate(Employee e){
+        this.setFirstName(e.getFirstName());
+        this.setLastName(e.getLastName());
+        this.setAge(e.getAge());
+
+        return this;
+    }
+
+    @Override
+    public int hashCode() {
+        HashCodeBuilder build = new HashCodeBuilder(45, 3)
+                .append(this.getFirstName() != null ? this.getFirstName() : null)
+                .append(this.getLastName() != null ? this.getLastName() : null)
+                .append(this.getAge());
+        return build.hashCode();
+    }
 }
