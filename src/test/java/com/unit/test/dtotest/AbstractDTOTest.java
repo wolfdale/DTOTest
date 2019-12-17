@@ -1,10 +1,14 @@
 package com.unit.test.dtotest;
 
+import com.unit.test.dto.AbstractBaseDTO;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.springframework.scheduling.support.SimpleTriggerContext;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
@@ -12,10 +16,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public abstract class AbstractDTOTest<T> {
+public abstract class AbstractDTOTest<T extends AbstractBaseDTO<T>> {
 
     public static final Pattern ACCESSOR_NAME_REGEX = Pattern.compile("(?:get|is)([a-zA-Z0-9]+)");
 
@@ -103,6 +107,44 @@ public abstract class AbstractDTOTest<T> {
         method[1].invoke(ob1, input2);
 
         assertTrue(ob1.equals(ob2));
+
+    }
+
+    @Test
+    public void testEqualityForAll() throws Exception {
+        T objA = this.getInstance();
+        T objB = this.getInstance();
+
+        assertTrue(objA.equals(objB));
+
+        for (Map.Entry<String, Method[]> entry : this.fields.entrySet()) {
+            String field = entry.getKey();
+            Method[] method = entry.getValue();
+
+            Object input = this.getInputValueForMutator(field);
+            method[1].invoke(objA, input);
+            method[1].invoke(objB, input);
+
+        }
+
+        assertTrue(objA.equals(objB));
+    }
+
+    @ParameterizedTest
+    @MethodSource("getFieldNames")
+    public void testPopulateForIndividualFields(String field) throws Exception{
+        T objA = this.getInstance();
+        T objB = this.getInstance();
+
+        assertTrue(objA.equals(objB));
+
+        Method[] method = this.fields.get(field);
+        Object input = this.getInputValueForMutator(field);
+        method[1].invoke(objA, input);
+
+        objB.populate(objA);
+
+        assertEquals(objA, objB);
 
     }
 

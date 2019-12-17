@@ -3,7 +3,7 @@ package com.unit.test.dto;
 /**
  * Employee DTO
  */
-public class Employee {
+public class Employee extends AbstractBaseDTO<Employee>{
 
     private String firstName;
     private String lastName;
@@ -55,5 +55,17 @@ public class Employee {
         }
 
         return false;
+    }
+
+    /**
+     * Populate Method
+     */
+    @Override
+    public Employee populate(Employee e){
+        this.setFirstName(e.getFirstName());
+        this.setLastName(e.getLastName());
+        this.setAge(e.getAge());
+
+        return this;
     }
 }
