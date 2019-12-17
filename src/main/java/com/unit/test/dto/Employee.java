@@ -33,16 +33,23 @@ public class Employee {
         this.age = age;
     }
 
+    /**
+     * This is not good implementation of equals method.
+     * Quick hack is done just to demo how DTO testing
+     * is performed.
+     *
+     * @param obj
+     * @return
+     */
     @Override
     public boolean equals(Object obj) {
 
         if (obj instanceof Employee) {
             Employee e = (Employee) obj;
 
-            if(e.getFirstName() != null) {
+            if (e.getFirstName() != null) {
                 return this.firstName.equalsIgnoreCase(e.getFirstName()) ? true : false;
-            }
-            else {
+            } else {
                 return true;
             }
         }
