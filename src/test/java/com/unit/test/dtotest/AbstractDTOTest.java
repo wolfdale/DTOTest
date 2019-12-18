@@ -8,6 +8,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.rmi.server.ExportException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -193,10 +195,24 @@ public abstract class AbstractDTOTest<T extends AbstractBaseDTO<T>> {
             methods[1].invoke(objA, input);
             methods[1].invoke(objB, input);
 
-            //assertTrue(objA.hashCode() == objB.hashCode());
+            assertTrue(objA.hashCode() == objB.hashCode());
 
         }
 
         assertEquals(objA.hashCode(), objB.hashCode());
     }
+
+    @ParameterizedTest
+    @MethodSource("getFieldNames")
+    public void testGetterAndSetter(String field) throws Exception {
+        Method[] methods = this.fields.get(field);
+
+        T dto = this.getInstance();
+
+        //Assumption that DTO classes contains only primitive members
+        Object expected = this.getOutputValueForAccessor(field, null);
+        Object actual = methods[0].invoke(dto);
+
+    }
+
 }
